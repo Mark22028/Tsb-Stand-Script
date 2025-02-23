@@ -1,0 +1,170 @@
+-- Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "Stand Gui"
+gui.Parent = game.CoreGui -- Prevents GUI from being removed on death
+
+-- Main Frame
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 270, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -125, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+mainFrame.BackgroundTransparency = 0.2
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- UI Corner for Round Outline
+local mainCorner = Instance.new("UICorner", mainFrame)
+mainCorner.CornerRadius = UDim.new(0, 15)
+
+-- User Input for Target Username
+local userInput = Instance.new("TextBox", mainFrame)
+userInput.Size = UDim2.new(0, 200, 0, 30)
+userInput.Position = UDim2.new(0.5, -100, 0.1, 0)
+userInput.PlaceholderText = "Enter Target Username"
+userInput.Text = ""
+userInput.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+userInput.TextColor3 = Color3.fromRGB(0, 255, 0)
+userInput.ClearTextOnFocus = false
+userInput.TextScaled = true
+
+-- UI Corner for Start Button
+local inputCorner = Instance.new("UICorner", startButton)
+inputCorner.CornerRadius = UDim.new(0, 10)
+
+-- Start Button
+local startButton = Instance.new("TextButton", mainFrame)
+startButton.Size = UDim2.new(0, 200, 0, 30)
+startButton.Position = UDim2.new(0.5, -100, 0.4, 0)
+startButton.Text = "Start!"
+startButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+startButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+startButton.TextScaled = true
+
+-- UI Corner for UserInput
+local input corner = Instance.new("UICorner",startButton)
+inputCorner.CornerRadius = UDim.new(0,10)
+
+-- Click to Target Button (Toggle)
+local clickToTargetButton = Instance.new("TextButton", mainFrame)
+clickToTargetButton.Size = UDim2.new(0, 200, 0, 30)
+clickToTargetButton.Position = UDim2.new(0.5, -100, 0.525, 0)
+clickToTargetButton.Text = "Click to Target: OFF"
+clickToTargetButton.BackgroundColor3 = Color3.fromRGB(50, 50, 150)
+clickToTargetButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+clickToTargetButton.TextScaled = true
+
+-- UI Corner for Click to Target Button
+local clickToTargetCorner = Instance.new("UICorner", clickToTargetButton)
+clickToTargetCorner.CornerRadius = UDim.new(0, 10)
+
+-- Destroy GUI Button
+local destroyButton = Instance.new("TextButton", mainFrame)
+destroyButton.Size = UDim2.new(0, 200, 0, 30)
+destroyButton.Position = UDim2.new(0.5, -100, 0.65, 0)
+destroyButton.Text = "Destroy GUI"
+destroyButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+destroyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+destroyButton.TextScaled = true
+
+-- UI Corner for Destroy Button
+local destroyCorner = Instance.new("UICorner", destroyButton)
+destroyCorner.CornerRadius = UDim.new(0, 10)
+
+-- CMDS Button
+local cmdsButton = Instance.new("TextButton", mainFrame)
+cmdsButton.Size = UDim2.new(0, 200, 0, 30)
+cmdsButton.Position = UDim2.new(0.5, -100, 0.775, 0)
+cmdsButton.Text = "CMDS"
+cmdsButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
+cmdsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+cmdsButton.TextScaled = true
+
+-- UI Corner for CMDS Button
+local cmdsCorner = Instance.new("UICorner", cmdsButton)
+cmdsCorner.CornerRadius = UDim.new(0, 10)
+
+-- Global Variables
+getgenv().clickToTargetEnabled = false
+
+-- Click to Target Functionality
+clickToTargetButton.MouseButton1Click:Connect(function()
+    getgenv().clickToTargetEnabled = not getgenv().clickToTargetEnabled
+    clickToTargetButton.Text = getgenv().clickToTargetEnabled and "Click to Target: ON" or "Click to Target: OFF"
+end)
+
+-- Detect Player Click
+local function onPlayerClicked(target)
+    if getgenv().clickToTargetEnabled and target and target.Parent and target.Parent:FindFirstChild("Humanoid") then
+        local player = game.Players:GetPlayerFromCharacter(target.Parent)
+        if player then
+            userInput.Text = player.Name
+            getgenv().clickToTargetEnabled = false
+            clickToTargetButton.Text = "Click to Target: OFF"
+        end
+    end
+end
+
+-- Detect Mouse Click
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+mouse.Button1Down:Connect(function()
+    if getgenv().clickToTargetEnabled then
+        onPlayerClicked(mouse.Target)
+    end
+end)
+
+-- CMDS Button Functionality
+cmdsButton.MouseButton1Click:Connect(function()
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Commands (1/2): appear (Summon) | disappear (Dismiss) | 1 (Punch) | 2 (Barrage) | 3(Shove) | 4 (Uppercut)", "All")
+    wait()
+    game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Commands (2/2): !givestand [player] | !returnstand | !swappos | !shadow | !unshadow | !combo | !pose | !distance [0/10] | !reset | !break", "All")
+end)
+
+-- Start Button Functionality
+startButton.MouseButton1Click:Connect(function()
+    local targetUsername = userInput.Text
+    if targetUsername and targetUsername ~= "" then
+        getgenv().TargetPlayer = targetUsername
+        getgenv().SummonWord = "appear"
+        getgenv().DismissWord = "disappear"
+        getgenv().SkillWord1 = "1"
+        getgenv().SkillWord2 = "2"
+        getgenv().SkillWord3 = "3"
+        getgenv().SkillWord4 = "4"
+        getgenv().standPosition = "right"
+        getgenv().Skill1Quote = "Muda da. Kore de saigo da!"
+        getgenv().Skill2Quote = "GRAAH! Omae wa ore ni makenai!"
+        getgenv().Skill3Quote = "Tch. Dōshi te oite!"
+        getgenv().Skill4Quote = "Uppākatto! Subete o owari ni suru"
+        getgenv().CooldownMessage = "Tch. Cooldown's not done yet. Be patient!"
+        getgenv().SummonQuote1 = "Hmph. Let's get this over with."
+        getgenv().SummonQuote2 = "Star Platinum at your service."
+        getgenv().DisappearQuote1 = "You've got it. I'm out of here"
+        getgenv().DisappearQuote2 = "Fine. Don't mess this up."
+        loadstring(game:HttpGet("https://paste.ee/r/HR95QbWO/0", true))()
+    end
+end)
+
+-- Destroy GUI
+destroyButton.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Toggle Button
+local toggleButton = Instance.new("TextButton", gui)
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+toggleButton.Text = "S"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.BorderSizePixel = 0
+toggleButton.Draggable = true
+
+local uiCorner = Instance.new("UICorner", toggleButton)
+uiCorner.CornerRadius = UDim.new(1, 0)
+
+-- Toggle GUI Visibility
+toggleButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
